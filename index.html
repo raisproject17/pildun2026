@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> LIVE PIALA DUNIA 2026 by raistech </title>
+    <title>LIVE PIALA DUNIA 2026</title>
     <!-- Tailwind CSS untuk Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HLS.js untuk memutar format .m3u8 -->
@@ -36,7 +36,7 @@
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-trophy text-yellow-400 text-2xl"></i>
                 <h1 class="text-xl md:text-2xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">
-                    LIVE PIALA DUNIA 2026 by raistech.
+                    LIVE PIALA DUNIA 2026
                 </h1>
             </div>
             <div class="hidden md:flex items-center gap-2 text-sm text-slate-400">
@@ -59,25 +59,42 @@
                 <!-- Loading Indicator Overlay -->
                 <div id="loading-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-10 hidden">
                     <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500 mb-3"></i>
-                    <p class="text-slate-300 font-medium">Memuat Stream...</p>
+                    <p id="loading-text" class="text-slate-300 font-medium">Memuat Stream...</p>
                 </div>
             </div>
             
             <div class="bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-700">
-                <h2 id="current-channel-name" class="text-xl font-bold text-blue-400 mb-1">Pilih Server</h2>
-                <p id="current-channel-status" class="text-sm text-slate-400">Silakan pilih server pertandingan dari daftar di samping/bawah.</p>
+                <h2 id="current-channel-name" class="text-xl font-bold text-blue-400 mb-1">Pilih Server / Channel</h2>
+                <p id="current-channel-status" class="text-sm text-slate-400">Masukkan link Playlist M3U Anda atau gunakan list default.</p>
             </div>
         </div>
 
         <!-- Channel List Section -->
-        <div class="lg:w-1/4 flex flex-col bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg h-[500px] lg:h-auto">
-            <div class="p-4 bg-slate-850 border-b border-slate-700 flex justify-between items-center">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-list text-blue-400 mr-2"></i>Daftar Server</h3>
-                <span class="bg-blue-600/20 text-blue-400 text-xs px-2 py-1 rounded border border-blue-500/30">IPTV</span>
+        <div class="lg:w-1/4 flex flex-col bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg h-[600px] lg:h-auto">
+            <div class="p-4 bg-slate-850 border-b border-slate-700 flex flex-col gap-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-lg"><i class="fa-solid fa-list text-blue-400 mr-2"></i>Playlist M3U</h3>
+                    <span id="channel-count" class="bg-blue-600/20 text-blue-400 text-xs px-2 py-1 rounded border border-blue-500/30">0 Ch</span>
+                </div>
+                
+                <!-- Input URL M3U -->
+                <div class="flex flex-col gap-2">
+                    <input type="text" id="m3u-url" value="https://iptv-org.github.io/iptv/index.m3u" placeholder="Masukkan URL .m3u" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <button onclick="loadM3UPlaylist()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded transition-colors">
+                        <i class="fa-solid fa-cloud-arrow-down mr-1"></i> Muat Playlist
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-sm"></i>
+                    <input type="text" id="search-input" placeholder="Cari channel..." class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-blue-500" onkeyup="filterChannels()">
+                </div>
             </div>
             
             <div id="channel-container" class="channel-list p-2 overflow-y-auto flex-grow flex flex-col gap-2">
                 <!-- Channel buttons will be generated here by JavaScript -->
+                <div class="text-center text-slate-500 p-4 text-sm">Klik "Muat Playlist" untuk menampilkan daftar channel.</div>
             </div>
         </div>
 
@@ -97,75 +114,152 @@
 
     <!-- Player Logic Script -->
     <script>
-        // === KONFIGURASI DAFTAR CHANNEL IPTV (.m3u8) ===
-        // Ganti URL m3u8 di bawah ini dengan link IPTV Piala Dunia Anda yang aktif.
-        // Saat ini menggunakan link m3u8 dummy/test stream publik sebagai contoh.
-        const channels = [
-            {
-                id: 1,
-                name: "Server 1 (Main FHD)",
-                url: "https://ott-balancer.tvri.go.id/live/eds/SportHD/hls/SportHD.m3u8",
-                icon: "fa-tv"
-            },
-            {
-                id: 2,
-                name: "Server 2 (Cadangan HD)",
-                url: "https://ott-balancer.tvri.go.id/live/eds/Nasional/hls/Nasional.m3u8",
-                icon: "fa-satellite-dish"
-            },
-            {
-                id: 3,
-                name: "Server 3 (CT SPORT 720)",
-                url: "http://88.212.7.10/live/test_ctsport_25p/playlist.m3u8",
-                icon: "fa-video"
-            },
-            {
-                id: 4,
-                name: "Server 4 (Low Data)",
-                url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8", // Ganti dengan link 480p
-                icon: "fa-mobile-screen"
-            }
-        ];
-
         const videoElement = document.getElementById('video-player');
         const channelContainer = document.getElementById('channel-container');
         const currentChannelName = document.getElementById('current-channel-name');
         const currentChannelStatus = document.getElementById('current-channel-status');
         const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+        const urlInput = document.getElementById('m3u-url');
+        const searchInput = document.getElementById('search-input');
+        const channelCountDisplay = document.getElementById('channel-count');
         
         let hlsPlayer = null;
-        let activeChannelId = null;
+        let activeChannelUrl = null;
+        let allChannels = [];
+        let renderLimit = 100; // Batasi render agar browser tidak nge-lag jika channel puluhan ribu
 
-        // Render daftar channel ke sidebar
-        function renderChannels() {
-            channelContainer.innerHTML = '';
-            channels.forEach(channel => {
-                const button = document.createElement('button');
-                button.className = `w-full text-left p-3 rounded-lg flex items-center gap-3 transition-all duration-200 border ${activeChannelId === channel.id ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-slate-700/50 border-transparent text-slate-300 hover:bg-slate-700 hover:text-white'}`;
+        // Fungsi untuk mengambil dan mem-parsing file M3U
+        async function loadM3UPlaylist() {
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            loadingOverlay.classList.remove('hidden');
+            loadingText.innerText = "Mengunduh Playlist...";
+            channelContainer.innerHTML = `<div class="text-center text-blue-400 p-4 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memproses playlist...</div>`;
+            allChannels = [];
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Gagal mengambil file M3U. Mungkin diblokir oleh CORS.");
                 
+                const text = await response.text();
+                loadingText.innerText = "Memparsing Channel...";
+                
+                const lines = text.split('\n');
+                let currentChannel = {};
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    if (line.startsWith('#EXTINF:')) {
+                        // Ambil Logo
+                        const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+                        currentChannel.logo = logoMatch ? logoMatch[1] : null;
+
+                        // Ambil Grup/Kategori
+                        const groupMatch = line.match(/group-title="([^"]+)"/);
+                        currentChannel.group = groupMatch ? groupMatch[1] : '';
+
+                        // Ambil Nama Channel (biasanya setelah koma terakhir)
+                        const nameParts = line.split(',');
+                        currentChannel.name = nameParts.length > 1 ? nameParts[nameParts.length - 1].trim() : 'Unknown Channel';
+                    } 
+                    else if (line && !line.startsWith('#')) {
+                        // Ini adalah URL stream
+                        currentChannel.url = line;
+                        // Simpan channel jika valid
+                        if (currentChannel.name && currentChannel.url) {
+                            allChannels.push({...currentChannel});
+                        }
+                        currentChannel = {}; // Reset untuk channel berikutnya
+                    }
+                }
+
+                channelCountDisplay.innerText = `${allChannels.length} Ch`;
+                searchInput.value = ''; // Reset pencarian
+                renderChannels(allChannels);
+
+            } catch (error) {
+                console.error(error);
+                channelContainer.innerHTML = `<div class="text-center text-red-500 p-4 text-sm"><i class="fa-solid fa-triangle-exclamation mb-2 text-2xl"></i><br>Gagal memuat M3U.<br>Pastikan link valid dan mendukung CORS (Cross-Origin Resource Sharing).</div>`;
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        // Fungsi filter pencarian
+        function filterChannels() {
+            const query = searchInput.value.toLowerCase();
+            if (!query) {
+                renderChannels(allChannels);
+                return;
+            }
+
+            const filtered = allChannels.filter(ch => 
+                ch.name.toLowerCase().includes(query) || 
+                ch.group.toLowerCase().includes(query)
+            );
+            renderChannels(filtered);
+        }
+
+        // Render daftar channel ke sidebar (Dibatasi 100 pertama agar tidak berat)
+        function renderChannels(channelsToRender) {
+            channelContainer.innerHTML = '';
+            
+            if (channelsToRender.length === 0) {
+                channelContainer.innerHTML = `<div class="text-center text-slate-500 p-4 text-sm">Tidak ada channel ditemukan.</div>`;
+                return;
+            }
+
+            // Potong array agar DOM tidak kelebihan beban (Max 150 item)
+            const displayList = channelsToRender.slice(0, 150);
+
+            displayList.forEach(channel => {
+                const button = document.createElement('button');
+                button.className = `w-full text-left p-2 rounded-lg flex items-center gap-3 transition-all duration-200 border ${activeChannelUrl === channel.url ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-slate-700/50 border-transparent text-slate-300 hover:bg-slate-700 hover:text-white'}`;
+                
+                // Cek Logo (Gunakan icon jika logo tidak ada)
+                let iconHtml = '';
+                if (channel.logo) {
+                    // Gunakan object/img, jika error ganti ke icon
+                    iconHtml = `<img src="${channel.logo}" class="w-8 h-8 object-contain bg-black/50 rounded flex-shrink-0" onerror="this.outerHTML='<div class=\\'w-8 h-8 rounded bg-slate-900 flex items-center justify-center flex-shrink-0\\'><i class=\\'fa-solid fa-tv text-slate-500\\'></i></div>'">`;
+                } else {
+                    iconHtml = `<div class="w-8 h-8 rounded bg-slate-900 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-tv ${activeChannelUrl === channel.url ? 'text-blue-400' : 'text-slate-400'}"></i>
+                                </div>`;
+                }
+
                 button.innerHTML = `
-                    <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid ${channel.icon} ${activeChannelId === channel.id ? 'text-blue-400' : 'text-slate-400'}"></i>
+                    ${iconHtml}
+                    <div class="flex-grow font-medium truncate flex flex-col justify-center overflow-hidden">
+                        <span class="truncate text-sm">${channel.name}</span>
+                        ${channel.group ? `<span class="text-[10px] text-slate-400 truncate">${channel.group}</span>` : ''}
                     </div>
-                    <div class="flex-grow font-medium truncate">
-                        ${channel.name}
-                    </div>
-                    ${activeChannelId === channel.id ? '<div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>' : ''}
+                    ${activeChannelUrl === channel.url ? '<div class="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0"></div>' : ''}
                 `;
                 
                 button.onclick = () => playStream(channel);
                 channelContainer.appendChild(button);
             });
+
+            if (channelsToRender.length > 150) {
+                const info = document.createElement('div');
+                info.className = "text-center text-slate-400 p-2 text-xs";
+                info.innerText = `Menampilkan 150 dari ${channelsToRender.length} channel. Gunakan pencarian untuk mencari spesifik.`;
+                channelContainer.appendChild(info);
+            }
         }
 
         // Fungsi untuk memutar stream
         function playStream(channel) {
-            activeChannelId = channel.id;
-            renderChannels(); // Update status tombol (aktif/tidak)
+            activeChannelUrl = channel.url;
+            filterChannels(); // Update status tombol (aktif/tidak) tanpa mereset list pencarian
             
             // Update UI teks
             currentChannelName.innerHTML = `<span class="text-red-500 mr-2">● LIVE</span> ${channel.name}`;
             currentChannelStatus.innerText = "Menghubungkan ke server stream...";
+            loadingText.innerText = "Memuat Stream...";
             loadingOverlay.classList.remove('hidden');
 
             // Hancurkan instance HLS sebelumnya jika ada
@@ -176,7 +270,7 @@
             // Cek dukungan HLS
             if (Hls.isSupported()) {
                 hlsPlayer = new Hls({
-                    maxBufferLength: 30, // optimasi buffer untuk live
+                    maxBufferLength: 30,
                     liveSyncDurationCount: 3,
                 });
                 
@@ -186,16 +280,17 @@
                 hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function () {
                     loadingOverlay.classList.add('hidden');
                     currentChannelStatus.innerHTML = "Berhasil terhubung. Menyiarkan <b>" + channel.name + "</b>.";
-                    videoElement.play().catch(e => console.log("Autoplay dicegah browser, harus klik play manually."));
+                    videoElement.play().catch(e => console.log("Autoplay dicegah browser."));
                 });
 
                 hlsPlayer.on(Hls.Events.ERROR, function (event, data) {
                     if (data.fatal) {
                         loadingOverlay.classList.add('hidden');
-                        currentChannelStatus.innerHTML = `<span class="text-red-400"><i class="fa-solid fa-triangle-exclamation"></i> Gagal memuat stream. Server mungkin sedang offline atau diblokir.</span>`;
+                        currentChannelStatus.innerHTML = `<span class="text-red-400"><i class="fa-solid fa-triangle-exclamation"></i> Gagal memuat stream. (CORS Blocked / Offline)</span>`;
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
-                                hlsPlayer.startLoad(); // Coba muat ulang
+                                // Jangan startLoad lagi jika gagal total untuk menghindari infinite loop
+                                hlsPlayer.destroy();
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
                                 hlsPlayer.recoverMediaError();
@@ -225,12 +320,6 @@
                 currentChannelStatus.innerHTML = `<span class="text-yellow-400">Browser Anda tidak mendukung pemutaran video format ini.</span>`;
             }
         }
-
-        // Inisialisasi awal (Render list tanpa autoplay)
-        renderChannels();
-        
-        // Opsional: otomatis putar server 1 saat halaman dimuat (hilangkan komen jika ingin auto-play)
-        // playStream(channels[0]);
 
     </script>
 </body>
