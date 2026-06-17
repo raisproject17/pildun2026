@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIVE PIALA DUNIA 2026</title>
+    <title>PILDUN2026</title>
     <!-- Tailwind CSS untuk Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HLS.js untuk memutar format .m3u8 -->
@@ -42,7 +42,7 @@
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-trophy text-yellow-400 text-2xl"></i>
                 <h1 class="text-xl md:text-2xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">
-                    LIVE PIALA DUNIA 2026
+                    TV ONLINE by rais.project
                 </h1>
             </div>
             <div class="hidden md:flex items-center gap-2 text-sm text-slate-400">
@@ -396,6 +396,12 @@
 
                     <!-- Filters -->
                     <div class="flex flex-col gap-2 mt-1">
+                        
+                        <!-- Quick Filter Piala Dunia -->
+                        <button id="btn-pildun-filter" onclick="togglePildunFilter()" class="w-full bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-500 border border-yellow-500/50 rounded py-2 text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-star"></i> Tampilkan Khusus Chanel Piala Dunia
+                        </button>
+
                         <!-- Search Bar -->
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-sm"></i>
@@ -471,6 +477,8 @@
         let allChannels = [];
         let renderLimit = 150; 
         
+        let isPildunFilterActive = false; // Status filter piala dunia
+
         // Untuk menghentikan proses pengecekan jaringan yang sedang berjalan jika user mencari/filter
         let activeTestAbortController = null;
 
@@ -526,6 +534,25 @@
             } else {
                 urlInput.classList.add('hidden');
             }
+        }
+
+        // Toggle khusus chanel Pildun
+        function togglePildunFilter() {
+            isPildunFilterActive = !isPildunFilterActive;
+            const btn = document.getElementById('btn-pildun-filter');
+            
+            if (isPildunFilterActive) {
+                btn.classList.replace('bg-yellow-600/20', 'bg-yellow-500');
+                btn.classList.replace('hover:bg-yellow-600/40', 'hover:bg-yellow-600');
+                btn.classList.replace('text-yellow-500', 'text-slate-900');
+                btn.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Hapus Filter Piala Dunia`;
+            } else {
+                btn.classList.replace('bg-yellow-500', 'bg-yellow-600/20');
+                btn.classList.replace('hover:bg-yellow-600', 'hover:bg-yellow-600/40');
+                btn.classList.replace('text-slate-900', 'text-yellow-500');
+                btn.innerHTML = `<i class="fa-solid fa-star"></i> Tampilkan Khusus Chanel Piala Dunia`;
+            }
+            filterChannels();
         }
 
         async function loadM3UPlaylist() {
@@ -634,12 +661,23 @@
             const selectedCategory = categorySelect.value;
             const selectedCountry = countrySelect.value;
 
+            // Keyword pencarian auto detect untuk Chanel Piala Dunia (lower case)
+            // ct sport ditambahkan tanpa simbol accent jaga-jaga format m3u nya polos
+            const pildunKeywords = ["tvri sport", "čt sport", "ct sport", "das erste", "trt 1", "cazetv"];
+
             const filtered = allChannels.filter(ch => {
-                const matchQuery = ch.name.toLowerCase().includes(query) || ch.group.toLowerCase().includes(query);
+                const nameLow = ch.name.toLowerCase();
+                const matchQuery = nameLow.includes(query) || ch.group.toLowerCase().includes(query);
                 const matchCategory = selectedCategory === "" || ch.group === selectedCategory;
                 const matchCountry = selectedCountry === "" || ch.country === selectedCountry;
                 
-                return matchQuery && matchCategory && matchCountry;
+                let matchPildun = true;
+                if (isPildunFilterActive) {
+                    // Hanya tampilkan jika namanya mengandung salah satu dari pildunKeywords
+                    matchPildun = pildunKeywords.some(keyword => nameLow.includes(keyword));
+                }
+                
+                return matchQuery && matchCategory && matchCountry && matchPildun;
             });
             
             renderChannels(filtered);
