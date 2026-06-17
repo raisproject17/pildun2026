@@ -86,61 +86,287 @@
             <!-- Jadwal Pertandingan Section (Awalnya Sembunyi) -->
             <div id="jadwal-section" class="hidden flex-col bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg transition-all duration-300">
                 <div class="p-4 bg-slate-850 border-b border-slate-700 flex justify-between items-center">
-                    <h3 class="font-bold text-lg"><i class="fa-regular fa-calendar-days text-green-400 mr-2"></i>Jadwal Terdekat</h3>
+                    <h3 class="font-bold text-lg"><i class="fa-regular fa-calendar-days text-green-400 mr-2"></i>Jadwal Pekan 2</h3>
                     <span class="bg-green-600/20 text-green-400 text-xs px-2 py-1 rounded border border-green-500/30">WIB</span>
                 </div>
-                <div class="p-3 flex flex-col gap-3 max-h-[400px] overflow-y-auto channel-list">
-                    
-                    <!-- Match 1 (Selesai) -->
-                    <div class="flex items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
-                        <div class="flex flex-col">
-                            <span class="text-[10px] text-slate-400 mb-1">17 Jun 2026 • 20:00 WIB</span>
-                            <div class="flex items-center gap-2 font-bold text-sm text-slate-300">
-                                <span>ARG</span>
-                                <span class="text-slate-500 text-xs">vs</span>
-                                <span>KSA</span>
-                            </div>
-                        </div>
-                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">FT</div>
-                    </div>
+                
+                <!-- Tab Pilihan Jadwal -->
+                <div class="flex gap-2 p-2 border-b border-slate-700 bg-slate-850/50">
+                    <button id="btn-tab-terdekat" onclick="setJadwalMode('terdekat')" class="flex-1 py-1.5 text-xs font-bold rounded bg-green-600 text-white transition-colors">Terdekat</button>
+                    <button id="btn-tab-semua" onclick="setJadwalMode('semua')" class="flex-1 py-1.5 text-xs font-bold rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors">Semua Jadwal</button>
+                </div>
 
-                    <!-- Match 2 (LIVE saat ini) -->
-                    <div class="flex items-center justify-between bg-blue-900/20 p-3 rounded-lg border border-blue-500/30">
+                <div id="list-jadwal" class="p-3 flex flex-col gap-3 max-h-[400px] overflow-y-auto channel-list">
+                    
+                    <!-- === RABU, 17 JUNI === -->
+                    <div class="match-item jadwal-terdekat flex items-center justify-between bg-blue-900/20 p-3 rounded-lg border border-blue-500/30">
                         <div class="flex flex-col">
-                            <span class="text-[10px] text-blue-300 mb-1">17 Jun 2026 • 23:00 WIB</span>
+                            <span class="text-[10px] text-blue-300 mb-1">17 Jun 2026 • 23:00 WIB • Grup K</span>
                             <div class="flex items-center gap-2 font-bold text-sm text-white">
-                                <span>ENG</span>
+                                <span class="truncate w-12">POR</span>
                                 <span class="text-blue-500 text-xs">vs</span>
-                                <span>USA</span>
+                                <span class="truncate w-12 text-right">RDC</span>
                             </div>
                         </div>
                         <div class="text-[10px] font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded border border-red-500/20 animate-pulse">LIVE</div>
                     </div>
 
-                    <!-- Match 3 (Segera) -->
-                    <div class="flex items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                    <!-- === KAMIS, 18 JUNI === -->
+                    <div class="match-item jadwal-terdekat flex items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
                         <div class="flex flex-col">
-                            <span class="text-[10px] text-slate-400 mb-1">18 Jun 2026 • 02:00 WIB</span>
+                            <span class="text-[10px] text-slate-400 mb-1">18 Jun 2026 • 03:00 WIB • Grup L</span>
                             <div class="flex items-center gap-2 font-bold text-sm text-white">
-                                <span>FRA</span>
+                                <span class="truncate w-12">ENG</span>
                                 <span class="text-slate-500 text-xs">vs</span>
-                                <span>AUS</span>
+                                <span class="truncate w-12 text-right">CRO</span>
                             </div>
                         </div>
-                        <div class="text-[10px] font-bold text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded">Segera</div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">03:00</div>
+                    </div>
+                    
+                    <div class="match-item jadwal-terdekat flex items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">18 Jun 2026 • 06:00 WIB • Grup L</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">GHA</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">PAN</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">06:00</div>
                     </div>
 
-                    <!-- Match 4 (Akan Datang) -->
-                    <div class="flex items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                    <div class="match-item jadwal-terdekat flex items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
                         <div class="flex flex-col">
-                            <span class="text-[10px] text-slate-400 mb-1">18 Jun 2026 • 05:00 WIB</span>
+                            <span class="text-[10px] text-slate-400 mb-1">18 Jun 2026 • 09:00 WIB • Grup K</span>
                             <div class="flex items-center gap-2 font-bold text-sm text-white">
-                                <span>ESP</span>
+                                <span class="truncate w-12">UZB</span>
                                 <span class="text-slate-500 text-xs">vs</span>
-                                <span>JPN</span>
+                                <span class="truncate w-12 text-right">COL</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">09:00</div>
+                    </div>
+
+                    <div class="match-item jadwal-terdekat flex items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">18 Jun 2026 • 23:00 WIB • Grup A</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">CZE</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">RSA</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">23:00</div>
+                    </div>
+
+                    <!-- === JUMAT, 19 JUNI === -->
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">19 Jun 2026 • 02:00 WIB • Grup B</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">SUI</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">BIH</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">02:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">19 Jun 2026 • 05:00 WIB • Grup B</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">CAN</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">QAT</span>
                             </div>
                         </div>
                         <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">05:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">19 Jun 2026 • 08:00 WIB • Grup A</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">MEX</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">KOR</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">08:00</div>
+                    </div>
+
+                    <!-- === SABTU, 20 JUNI === -->
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">20 Jun 2026 • 02:00 WIB • Grup D</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">USA</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">AUS</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">02:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">20 Jun 2026 • 05:00 WIB • Grup C</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">SCO</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">MAR</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">05:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">20 Jun 2026 • 07:30 WIB • Grup C</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">BRA</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">HAI</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">07:30</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">20 Jun 2026 • 10:00 WIB • Grup D</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">TUR</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">PAR</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">10:00</div>
+                    </div>
+
+                    <!-- === MINGGU, 21 JUNI === -->
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">21 Jun 2026 • 00:00 WIB • Grup F</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">NED</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">SWE</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">00:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">21 Jun 2026 • 03:00 WIB • Grup E</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">GER</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">CIV</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">03:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">21 Jun 2026 • 07:00 WIB • Grup E</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">ECU</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">CUW</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">07:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">21 Jun 2026 • 11:00 WIB • Grup F</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">TUN</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">JPN</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">11:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">21 Jun 2026 • 23:00 WIB • Grup H</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">ESP</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">KSA</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">23:00</div>
+                    </div>
+
+                    <!-- === SENIN, 22 JUNI === -->
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">22 Jun 2026 • 02:00 WIB • Grup G</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">BEL</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">IRN</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">02:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">22 Jun 2026 • 05:00 WIB • Grup H</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">URU</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">CPV</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">05:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">22 Jun 2026 • 08:00 WIB • Grup G</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">NZL</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">EGY</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">08:00</div>
+                    </div>
+
+                    <!-- === SELASA, 23 JUNI === -->
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">23 Jun 2026 • 00:00 WIB • Grup J</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">ARG</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">AUT</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">00:00</div>
+                    </div>
+
+                    <div class="match-item hidden items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-slate-600/50">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 mb-1">23 Jun 2026 • 04:00 WIB • Grup I</span>
+                            <div class="flex items-center gap-2 font-bold text-sm text-white">
+                                <span class="truncate w-12">FRA</span>
+                                <span class="text-slate-500 text-xs">vs</span>
+                                <span class="truncate w-12 text-right">IRQ</span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 bg-slate-600/30 px-2 py-1 rounded">04:00</div>
                     </div>
 
                 </div>
@@ -248,7 +474,7 @@
         // Untuk menghentikan proses pengecekan jaringan yang sedang berjalan jika user mencari/filter
         let activeTestAbortController = null;
 
-        // Fungsi Toggle Jadwal Pildun
+        // Fungsi Toggle & Filter Jadwal Pildun
         function toggleJadwal() {
             const jadwalSection = document.getElementById('jadwal-section');
             if (jadwalSection.classList.contains('hidden')) {
@@ -257,6 +483,39 @@
             } else {
                 jadwalSection.classList.add('hidden');
                 jadwalSection.classList.remove('flex');
+            }
+        }
+
+        function setJadwalMode(mode) {
+            const btnTerdekat = document.getElementById('btn-tab-terdekat');
+            const btnSemua = document.getElementById('btn-tab-semua');
+            const matchItems = document.querySelectorAll('.match-item');
+
+            if (mode === 'terdekat') {
+                // UI Toggle
+                btnTerdekat.className = "flex-1 py-1.5 text-xs font-bold rounded bg-green-600 text-white transition-colors";
+                btnSemua.className = "flex-1 py-1.5 text-xs font-bold rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors";
+                
+                // Show only Nearest (Terdekat) Matches
+                matchItems.forEach(item => {
+                    if (item.classList.contains('jadwal-terdekat')) {
+                        item.classList.remove('hidden');
+                        item.classList.add('flex');
+                    } else {
+                        item.classList.remove('flex');
+                        item.classList.add('hidden');
+                    }
+                });
+            } else {
+                // UI Toggle
+                btnSemua.className = "flex-1 py-1.5 text-xs font-bold rounded bg-green-600 text-white transition-colors";
+                btnTerdekat.className = "flex-1 py-1.5 text-xs font-bold rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors";
+                
+                // Show All Matches
+                matchItems.forEach(item => {
+                    item.classList.remove('hidden');
+                    item.classList.add('flex');
+                });
             }
         }
 
