@@ -26,6 +26,12 @@
         .channel-list::-webkit-scrollbar-thumb:hover {
             background: #2563eb; 
         }
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 9999px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex flex-col font-sans">
@@ -65,48 +71,69 @@
             
             <div class="bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-700">
                 <h2 id="current-channel-name" class="text-xl font-bold text-blue-400 mb-1">Pilih Server / Channel</h2>
-                <p id="current-channel-status" class="text-sm text-slate-400">Masukkan link Playlist M3U Anda atau gunakan list default.</p>
+                <p id="current-channel-status" class="text-sm text-slate-400">Silakan muat playlist dan pilih channel dari daftar di samping.</p>
             </div>
         </div>
 
         <!-- Channel List Section -->
-        <div class="lg:w-1/4 flex flex-col bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg h-[600px] lg:h-auto">
+        <div class="lg:w-1/4 flex flex-col bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg h-[650px] lg:h-auto">
             <div class="p-4 bg-slate-850 border-b border-slate-700 flex flex-col gap-3">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-lg"><i class="fa-solid fa-list text-blue-400 mr-2"></i>Playlist M3U</h3>
                     <span id="channel-count" class="bg-blue-600/20 text-blue-400 text-xs px-2 py-1 rounded border border-blue-500/30">0 Ch</span>
                 </div>
                 
-                <!-- Input URL M3U -->
+                <!-- Sumber Playlist Selection -->
                 <div class="flex flex-col gap-2">
-                    <input type="text" id="m3u-url" value="https://iptv-org.github.io/iptv/index.m3u" placeholder="Masukkan URL .m3u" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                    <button onclick="loadM3UPlaylist()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded transition-colors">
-                        <i class="fa-solid fa-cloud-arrow-down mr-1"></i> Muat Playlist
+                    <select id="source-select" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500" onchange="toggleSourceInput()">
+                        <option value="default">Gunakan IPTV Bawaan (Global)</option>
+                        <option value="custom">[+] Input URL IPTV Sendiri</option>
+                    </select>
+                    
+                    <input type="text" id="m3u-url" placeholder="Masukkan URL .m3u (Contoh: http://.../list.m3u)" class="hidden w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    
+                    <button onclick="loadM3UPlaylist()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded transition-colors flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> Muat Playlist
                     </button>
                 </div>
 
-                <!-- Search Bar & Category Filter -->
+                <!-- Filters -->
                 <div class="flex flex-col gap-2 mt-1">
                     <!-- Search Bar -->
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-sm"></i>
-                        <input type="text" id="search-input" placeholder="Cari channel..." class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-blue-500" onkeyup="filterChannels()">
+                        <input type="text" id="search-input" placeholder="Cari nama channel..." class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-blue-500" onkeyup="filterChannels()">
                     </div>
                     
-                    <!-- Category Dropdown -->
-                    <div class="relative">
-                        <i class="fa-solid fa-filter absolute left-3 top-2.5 text-slate-500 text-sm"></i>
-                        <select id="category-select" class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-9 pr-8 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer" onchange="filterChannels()">
-                            <option value="">Semua Kategori (Auto Detect)</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-3 top-2.5 text-slate-500 text-sm pointer-events-none"></i>
+                    <!-- Category & Country Filters -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <!-- Kategori -->
+                        <div class="relative">
+                            <i class="fa-solid fa-tags absolute left-2 top-2.5 text-slate-500 text-xs"></i>
+                            <select id="category-select" class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-7 pr-6 text-xs text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer" onchange="filterChannels()">
+                                <option value="">Semua Kategori</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-2 top-2.5 text-slate-500 text-xs pointer-events-none"></i>
+                        </div>
+                        
+                        <!-- Negara -->
+                        <div class="relative">
+                            <i class="fa-solid fa-globe absolute left-2 top-2.5 text-slate-500 text-xs"></i>
+                            <select id="country-select" class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-7 pr-6 text-xs text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer" onchange="filterChannels()">
+                                <option value="">Semua Negara</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-2 top-2.5 text-slate-500 text-xs pointer-events-none"></i>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div id="channel-container" class="channel-list p-2 overflow-y-auto flex-grow flex flex-col gap-2">
                 <!-- Channel buttons will be generated here by JavaScript -->
-                <div class="text-center text-slate-500 p-4 text-sm">Klik "Muat Playlist" untuk menampilkan daftar channel.</div>
+                <div class="text-center text-slate-500 p-4 text-sm mt-10">
+                    <i class="fa-solid fa-tv text-4xl mb-3 opacity-50"></i>
+                    <p>Klik "Muat Playlist" untuk menampilkan daftar channel.</p>
+                </div>
             </div>
         </div>
 
@@ -132,25 +159,49 @@
         const currentChannelStatus = document.getElementById('current-channel-status');
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingText = document.getElementById('loading-text');
+        
+        const sourceSelect = document.getElementById('source-select');
         const urlInput = document.getElementById('m3u-url');
         const searchInput = document.getElementById('search-input');
         const categorySelect = document.getElementById('category-select');
+        const countrySelect = document.getElementById('country-select');
         const channelCountDisplay = document.getElementById('channel-count');
+        
+        // Link Default (Disembunyikan dari UI)
+        const DEFAULT_IPTV_URL = "https://iptv-org.github.io/iptv/index.m3u";
         
         let hlsPlayer = null;
         let activeChannelUrl = null;
         let allChannels = [];
-        let renderLimit = 100; // Batasi render agar browser tidak nge-lag jika channel puluhan ribu
+        let renderLimit = 150; 
+        
+        // Untuk menghentikan proses pengecekan jaringan yang sedang berjalan jika user mencari/filter
+        let activeTestAbortController = null;
 
-        // Fungsi untuk mengambil dan mem-parsing file M3U
+        function toggleSourceInput() {
+            if (sourceSelect.value === 'custom') {
+                urlInput.classList.remove('hidden');
+                urlInput.value = ''; // Kosongkan saat beralih ke kustom
+            } else {
+                urlInput.classList.add('hidden');
+            }
+        }
+
         async function loadM3UPlaylist() {
-            const url = urlInput.value.trim();
-            if (!url) return;
+            // Tentukan URL yang akan di-load
+            let url = sourceSelect.value === 'default' ? DEFAULT_IPTV_URL : urlInput.value.trim();
+            
+            if (!url) {
+                alert("Silakan masukkan URL IPTV terlebih dahulu!");
+                return;
+            }
 
             loadingOverlay.classList.remove('hidden');
             loadingText.innerText = "Mengunduh Playlist...";
-            channelContainer.innerHTML = `<div class="text-center text-blue-400 p-4 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memproses playlist...</div>`;
+            channelContainer.innerHTML = `<div class="text-center text-blue-400 p-4 text-sm mt-10"><i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i><br>Memproses playlist...</div>`;
             allChannels = [];
+
+            if (activeTestAbortController) activeTestAbortController.abort(); // Hentikan tes sebelumnya
 
             try {
                 const response = await fetch(url);
@@ -161,159 +212,232 @@
                 
                 const lines = text.split('\n');
                 let currentChannel = {};
+                let channelIdCounter = 0;
 
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
                     
                     if (line.startsWith('#EXTINF:')) {
+                        // ID Unik untuk keperluan DOM Update
+                        currentChannel.id = 'ch_' + channelIdCounter++;
+                        
                         // Ambil Logo
                         const logoMatch = line.match(/tvg-logo="([^"]+)"/);
                         currentChannel.logo = logoMatch ? logoMatch[1] : null;
 
-                        // Ambil Grup/Kategori (Auto Detect)
+                        // Ambil Grup/Kategori
                         const groupMatch = line.match(/group-title="([^"]+)"/);
-                        currentChannel.group = groupMatch ? groupMatch[1] : 'Uncategorized';
+                        currentChannel.group = groupMatch && groupMatch[1] ? groupMatch[1] : 'Uncategorized';
 
-                        // Ambil Nama Channel (biasanya setelah koma terakhir)
+                        // Ambil Negara
+                        const countryMatch = line.match(/tvg-country="([^"]+)"/);
+                        currentChannel.country = countryMatch && countryMatch[1] ? countryMatch[1] : 'Unknown';
+
+                        // Status Default (Akan di tes saat render)
+                        currentChannel.status = 'untested'; 
+
+                        // Ambil Nama Channel
                         const nameParts = line.split(',');
                         currentChannel.name = nameParts.length > 1 ? nameParts[nameParts.length - 1].trim() : 'Unknown Channel';
                     } 
                     else if (line && !line.startsWith('#')) {
-                        // Ini adalah URL stream
                         currentChannel.url = line;
-                        // Simpan channel jika valid
                         if (currentChannel.name && currentChannel.url) {
                             allChannels.push({...currentChannel});
                         }
-                        currentChannel = {}; // Reset untuk channel berikutnya
+                        currentChannel = {};
                     }
                 }
 
                 channelCountDisplay.innerText = `${allChannels.length} Ch`;
-                searchInput.value = ''; // Reset pencarian
-                populateCategoryDropdown(); // Buat daftar kategori otomatis
-                renderChannels(allChannels);
+                searchInput.value = ''; 
+                populateDropdowns(); 
+                filterChannels(); // Akan memanggil renderChannels
 
             } catch (error) {
                 console.error(error);
-                channelContainer.innerHTML = `<div class="text-center text-red-500 p-4 text-sm"><i class="fa-solid fa-triangle-exclamation mb-2 text-2xl"></i><br>Gagal memuat M3U.<br>Pastikan link valid dan mendukung CORS (Cross-Origin Resource Sharing).</div>`;
+                channelContainer.innerHTML = `<div class="text-center text-red-500 p-4 text-sm mt-10"><i class="fa-solid fa-server mb-2 text-3xl"></i><br>Gagal memuat M3U.<br><span class="text-xs text-slate-400">Pastikan link valid dan server mendukung CORS.</span></div>`;
             } finally {
                 loadingOverlay.classList.add('hidden');
             }
         }
 
-        // Fungsi otomatis membuat pilihan kategori dari data yang di-parsing
-        function populateCategoryDropdown() {
-            // Bersihkan dropdown dan buat opsi default
+        // Buat daftar kategori & negara secara dinamis
+        function populateDropdowns() {
+            // --- Kategori ---
             categorySelect.innerHTML = '<option value="">Semua Kategori</option>';
-            
-            // Ambil nama grup yang unik dan tidak kosong, lalu urutkan abjad
             const uniqueGroups = [...new Set(allChannels.map(ch => ch.group))].filter(g => g !== 'Uncategorized' && g !== '').sort();
-            
             uniqueGroups.forEach(group => {
-                const option = document.createElement('option');
-                option.value = group;
-                option.textContent = group;
-                categorySelect.appendChild(option);
+                categorySelect.innerHTML += `<option value="${group}">${group}</option>`;
             });
+            if (allChannels.some(ch => ch.group === 'Uncategorized')) {
+                categorySelect.innerHTML += `<option value="Uncategorized">Uncategorized</option>`;
+            }
 
-            // Tambahkan "Uncategorized" di bagian paling bawah jika ada
-            const hasUncategorized = allChannels.some(ch => ch.group === 'Uncategorized');
-            if(hasUncategorized) {
-                const option = document.createElement('option');
-                option.value = 'Uncategorized';
-                option.textContent = 'Lain-lain (Uncategorized)';
-                categorySelect.appendChild(option);
+            // --- Negara ---
+            countrySelect.innerHTML = '<option value="">Semua Negara</option>';
+            const uniqueCountries = [...new Set(allChannels.map(ch => ch.country))].filter(c => c !== 'Unknown' && c !== '').sort();
+            uniqueCountries.forEach(country => {
+                // Format agar huruf kapital di awal (contoh: "id" -> "Id")
+                const displayCountry = country.toUpperCase();
+                countrySelect.innerHTML += `<option value="${country}">${displayCountry}</option>`;
+            });
+            if (allChannels.some(ch => ch.country === 'Unknown')) {
+                countrySelect.innerHTML += `<option value="Unknown">Lainnya (Unknown)</option>`;
             }
         }
 
-        // Fungsi filter pencarian dan kategori
+        // Fungsi filter
         function filterChannels() {
             const query = searchInput.value.toLowerCase();
             const selectedCategory = categorySelect.value;
+            const selectedCountry = countrySelect.value;
 
             const filtered = allChannels.filter(ch => {
-                // Cek apakah cocok dengan pencarian nama
                 const matchQuery = ch.name.toLowerCase().includes(query) || ch.group.toLowerCase().includes(query);
-                // Cek apakah cocok dengan kategori yang dipilih dropdown
                 const matchCategory = selectedCategory === "" || ch.group === selectedCategory;
+                const matchCountry = selectedCountry === "" || ch.country === selectedCountry;
                 
-                return matchQuery && matchCategory;
+                return matchQuery && matchCategory && matchCountry;
             });
+            
             renderChannels(filtered);
         }
 
-        // Render daftar channel ke sidebar (Dibatasi 150 pertama agar tidak berat)
+        // Render daftar channel ke sidebar & mulai Background Testing
         function renderChannels(channelsToRender) {
             channelContainer.innerHTML = '';
             
+            if (activeTestAbortController) {
+                activeTestAbortController.abort(); // Batalkan antrean tes sebelumnya
+            }
+            activeTestAbortController = new AbortController();
+            
             if (channelsToRender.length === 0) {
-                channelContainer.innerHTML = `<div class="text-center text-slate-500 p-4 text-sm">Tidak ada channel ditemukan.</div>`;
+                channelContainer.innerHTML = `<div class="text-center text-slate-500 p-4 text-sm mt-10">Tidak ada channel ditemukan.</div>`;
                 return;
             }
 
-            // Potong array agar DOM tidak kelebihan beban (Max 150 item)
-            const displayList = channelsToRender.slice(0, 150);
+            const displayList = channelsToRender.slice(0, renderLimit);
 
             displayList.forEach(channel => {
                 const button = document.createElement('button');
-                button.className = `w-full text-left p-2 rounded-lg flex items-center gap-3 transition-all duration-200 border ${activeChannelUrl === channel.url ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-slate-700/50 border-transparent text-slate-300 hover:bg-slate-700 hover:text-white'}`;
+                button.id = `btn_${channel.id}`;
+                button.className = `w-full text-left p-2 rounded-lg flex items-center gap-3 transition-all duration-200 border ${activeChannelUrl === channel.url ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-slate-700/50 border-transparent text-slate-300 hover:bg-slate-700 hover:text-white relative'}`;
                 
-                // Cek Logo (Gunakan icon jika logo tidak ada)
                 let iconHtml = '';
                 if (channel.logo) {
-                    // Gunakan object/img, jika error ganti ke icon
                     iconHtml = `<img src="${channel.logo}" class="w-8 h-8 object-contain bg-black/50 rounded flex-shrink-0" onerror="this.outerHTML='<div class=\\'w-8 h-8 rounded bg-slate-900 flex items-center justify-center flex-shrink-0\\'><i class=\\'fa-solid fa-tv text-slate-500\\'></i></div>'">`;
                 } else {
-                    iconHtml = `<div class="w-8 h-8 rounded bg-slate-900 flex items-center justify-center flex-shrink-0">
-                                    <i class="fa-solid fa-tv ${activeChannelUrl === channel.url ? 'text-blue-400' : 'text-slate-400'}"></i>
-                                </div>`;
+                    iconHtml = `<div class="w-8 h-8 rounded bg-slate-900 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-tv ${activeChannelUrl === channel.url ? 'text-blue-400' : 'text-slate-400'}"></i></div>`;
                 }
+
+                // Status Badge Warna
+                let statusColor = 'bg-slate-600 text-slate-300';
+                let statusText = 'Checking';
+                if (channel.status === 'online') { statusColor = 'bg-green-600/80 text-white'; statusText = 'Online'; }
+                else if (channel.status === 'offline') { statusColor = 'bg-red-600/80 text-white'; statusText = 'Offline'; }
 
                 button.innerHTML = `
                     ${iconHtml}
-                    <div class="flex-grow font-medium truncate flex flex-col justify-center overflow-hidden">
-                        <span class="truncate text-sm">${channel.name}</span>
-                        ${channel.group && channel.group !== 'Uncategorized' ? `<span class="text-[10px] text-slate-400 truncate">${channel.group}</span>` : ''}
+                    <div class="flex-grow font-medium truncate flex flex-col justify-center overflow-hidden pr-12">
+                        <span class="truncate text-sm font-semibold">${channel.name}</span>
+                        <div class="flex items-center gap-1 mt-0.5">
+                            ${channel.country !== 'Unknown' ? `<span class="text-[9px] uppercase border border-slate-600 px-1 rounded text-slate-400">${channel.country}</span>` : ''}
+                            ${channel.group && channel.group !== 'Uncategorized' ? `<span class="text-[10px] text-slate-400 truncate">${channel.group}</span>` : ''}
+                        </div>
                     </div>
-                    ${activeChannelUrl === channel.url ? '<div class="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0"></div>' : ''}
+                    <!-- Status Label -->
+                    <span id="status_${channel.id}" class="absolute right-2 top-3 status-badge ${statusColor}">${statusText}</span>
                 `;
                 
-                button.onclick = () => playStream(channel);
+                // Jangan izinkan klik jika sudah dipastikan offline
+                button.onclick = () => {
+                    if (channel.status === 'offline') {
+                        alert("Channel ini terdeteksi OFFLINE atau diblokir oleh CORS.");
+                        return;
+                    }
+                    playStream(channel);
+                };
+                
                 channelContainer.appendChild(button);
             });
 
-            if (channelsToRender.length > 150) {
+            if (channelsToRender.length > renderLimit) {
                 const info = document.createElement('div');
                 info.className = "text-center text-slate-400 p-2 text-xs";
-                info.innerText = `Menampilkan 150 dari ${channelsToRender.length} channel. Gunakan pencarian untuk mencari spesifik.`;
+                info.innerText = `Menampilkan ${renderLimit} dari ${channelsToRender.length} channel. Gunakan pencarian untuk hasil spesifik.`;
                 channelContainer.appendChild(info);
+            }
+
+            // Jalankan pengetesan status koneksi secara bertahap di background
+            testStreamsInBackground(displayList, activeTestAbortController.signal);
+        }
+
+        // Lazy Testing: Cek status koneksi (Hanya yg sedang dirender di layar)
+        async function testStreamsInBackground(channels, signal) {
+            for (let i = 0; i < channels.length; i++) {
+                if (signal.aborted) break; // Jika user mencari/filter lain, hentikan loop ini
+                
+                const ch = channels[i];
+                if (ch.status !== 'untested') continue; // Jika sudah dites, lewati
+
+                try {
+                    // Lakukan request HEAD ringan. Timeout 3 detik agar cepat.
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    
+                    const response = await fetch(ch.url, { method: 'HEAD', signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    ch.status = 'online';
+                    updateChannelStatusUI(ch.id, 'online');
+                } catch (error) {
+                    // Jika fetch gagal (karena CORS atau Server Offline)
+                    ch.status = 'offline';
+                    updateChannelStatusUI(ch.id, 'offline');
+                }
+            }
+        }
+
+        // Update warna UI Label Status secara spesifik
+        function updateChannelStatusUI(channelId, status) {
+            const badge = document.getElementById(`status_${channelId}`);
+            if (!badge) return;
+            
+            if (status === 'online') {
+                badge.className = 'absolute right-2 top-3 status-badge bg-green-600/80 text-white';
+                badge.innerText = 'Online';
+            } else if (status === 'offline') {
+                badge.className = 'absolute right-2 top-3 status-badge bg-red-600/80 text-white opacity-60';
+                badge.innerText = 'Offline';
             }
         }
 
         // Fungsi untuk memutar stream
         function playStream(channel) {
             activeChannelUrl = channel.url;
-            filterChannels(); // Update status tombol (aktif/tidak) tanpa mereset list pencarian
             
-            // Update UI teks
+            // Re-render UI untuk menyorot channel yang aktif
+            const currentListElements = document.querySelectorAll('#channel-container button');
+            currentListElements.forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'border-blue-500', 'text-white', 'shadow-[0_0_15px_rgba(37,99,235,0.3)]');
+                btn.classList.add('bg-slate-700/50', 'border-transparent', 'text-slate-300');
+                if(btn.id === `btn_${channel.id}`) {
+                    btn.classList.remove('bg-slate-700/50', 'border-transparent', 'text-slate-300');
+                    btn.classList.add('bg-blue-600', 'border-blue-500', 'text-white', 'shadow-[0_0_15px_rgba(37,99,235,0.3)]');
+                }
+            });
+            
             currentChannelName.innerHTML = `<span class="text-red-500 mr-2">● LIVE</span> ${channel.name}`;
             currentChannelStatus.innerText = "Menghubungkan ke server stream...";
             loadingText.innerText = "Memuat Stream...";
             loadingOverlay.classList.remove('hidden');
 
-            // Hancurkan instance HLS sebelumnya jika ada
-            if (hlsPlayer) {
-                hlsPlayer.destroy();
-            }
+            if (hlsPlayer) { hlsPlayer.destroy(); }
 
-            // Cek dukungan HLS
             if (Hls.isSupported()) {
-                hlsPlayer = new Hls({
-                    maxBufferLength: 30,
-                    liveSyncDurationCount: 3,
-                });
-                
+                hlsPlayer = new Hls({ maxBufferLength: 30, liveSyncDurationCount: 3 });
                 hlsPlayer.loadSource(channel.url);
                 hlsPlayer.attachMedia(videoElement);
                 
@@ -321,29 +445,29 @@
                     loadingOverlay.classList.add('hidden');
                     currentChannelStatus.innerHTML = "Berhasil terhubung. Menyiarkan <b>" + channel.name + "</b>.";
                     videoElement.play().catch(e => console.log("Autoplay dicegah browser."));
+                    
+                    // Pastikan terset online jika berhasil
+                    channel.status = 'online';
+                    updateChannelStatusUI(channel.id, 'online');
                 });
 
                 hlsPlayer.on(Hls.Events.ERROR, function (event, data) {
                     if (data.fatal) {
                         loadingOverlay.classList.add('hidden');
                         currentChannelStatus.innerHTML = `<span class="text-red-400"><i class="fa-solid fa-triangle-exclamation"></i> Gagal memuat stream. (CORS Blocked / Offline)</span>`;
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                // Jangan startLoad lagi jika gagal total untuk menghindari infinite loop
-                                hlsPlayer.destroy();
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                hlsPlayer.recoverMediaError();
-                                break;
-                            default:
-                                hlsPlayer.destroy();
-                                break;
+                        
+                        // Kunci status menjadi Offline jika gagal diputar
+                        channel.status = 'offline';
+                        updateChannelStatusUI(channel.id, 'offline');
+
+                        if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                            hlsPlayer.recoverMediaError();
+                        } else {
+                            hlsPlayer.destroy();
                         }
                     }
                 });
-
             } 
-            // Fallback untuk browser Safari / iOS (Native HLS support)
             else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
                 videoElement.src = channel.url;
                 videoElement.addEventListener('loadedmetadata', function () {
@@ -354,13 +478,14 @@
                 videoElement.addEventListener('error', function() {
                     loadingOverlay.classList.add('hidden');
                     currentChannelStatus.innerHTML = `<span class="text-red-400">Gagal memuat stream di perangkat ini.</span>`;
+                    channel.status = 'offline';
+                    updateChannelStatusUI(channel.id, 'offline');
                 });
             } else {
                 loadingOverlay.classList.add('hidden');
                 currentChannelStatus.innerHTML = `<span class="text-yellow-400">Browser Anda tidak mendukung pemutaran video format ini.</span>`;
             }
         }
-
     </script>
 </body>
 </html>
