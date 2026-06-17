@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PILDUN2026 by Raistech.</title>
+    <title>LIVE PIALA DUNIA 2026</title>
     <!-- Tailwind CSS untuk Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- HLS.js untuk memutar format .m3u8 -->
@@ -36,7 +36,7 @@
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-trophy text-yellow-400 text-2xl"></i>
                 <h1 class="text-xl md:text-2xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">
-                    PILDUN2026 by raistech
+                    LIVE PIALA DUNIA 2026
                 </h1>
             </div>
             <div class="hidden md:flex items-center gap-2 text-sm text-slate-400">
@@ -81,14 +81,26 @@
                 <div class="flex flex-col gap-2">
                     <input type="text" id="m3u-url" value="https://iptv-org.github.io/iptv/index.m3u" placeholder="Masukkan URL .m3u" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
                     <button onclick="loadM3UPlaylist()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded transition-colors">
-                        <i class="fa-solid fa-cloud-arrow-down mr-1"></i> Muat Playlist (click disini)
+                        <i class="fa-solid fa-cloud-arrow-down mr-1"></i> Muat Playlist
                     </button>
                 </div>
 
-                <!-- Search Bar -->
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-sm"></i>
-                    <input type="text" id="search-input" placeholder="Cari channel..." class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-blue-500" onkeyup="filterChannels()">
+                <!-- Search Bar & Category Filter -->
+                <div class="flex flex-col gap-2 mt-1">
+                    <!-- Search Bar -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-sm"></i>
+                        <input type="text" id="search-input" placeholder="Cari channel..." class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-blue-500" onkeyup="filterChannels()">
+                    </div>
+                    
+                    <!-- Category Dropdown -->
+                    <div class="relative">
+                        <i class="fa-solid fa-filter absolute left-3 top-2.5 text-slate-500 text-sm"></i>
+                        <select id="category-select" class="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-9 pr-8 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer" onchange="filterChannels()">
+                            <option value="">Semua Kategori (Auto Detect)</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-2.5 text-slate-500 text-sm pointer-events-none"></i>
+                    </div>
                 </div>
             </div>
             
@@ -122,6 +134,7 @@
         const loadingText = document.getElementById('loading-text');
         const urlInput = document.getElementById('m3u-url');
         const searchInput = document.getElementById('search-input');
+        const categorySelect = document.getElementById('category-select');
         const channelCountDisplay = document.getElementById('channel-count');
         
         let hlsPlayer = null;
@@ -157,9 +170,9 @@
                         const logoMatch = line.match(/tvg-logo="([^"]+)"/);
                         currentChannel.logo = logoMatch ? logoMatch[1] : null;
 
-                        // Ambil Grup/Kategori
+                        // Ambil Grup/Kategori (Auto Detect)
                         const groupMatch = line.match(/group-title="([^"]+)"/);
-                        currentChannel.group = groupMatch ? groupMatch[1] : '';
+                        currentChannel.group = groupMatch ? groupMatch[1] : 'Uncategorized';
 
                         // Ambil Nama Channel (biasanya setelah koma terakhir)
                         const nameParts = line.split(',');
@@ -178,6 +191,7 @@
 
                 channelCountDisplay.innerText = `${allChannels.length} Ch`;
                 searchInput.value = ''; // Reset pencarian
+                populateCategoryDropdown(); // Buat daftar kategori otomatis
                 renderChannels(allChannels);
 
             } catch (error) {
@@ -188,22 +202,48 @@
             }
         }
 
-        // Fungsi filter pencarian
+        // Fungsi otomatis membuat pilihan kategori dari data yang di-parsing
+        function populateCategoryDropdown() {
+            // Bersihkan dropdown dan buat opsi default
+            categorySelect.innerHTML = '<option value="">Semua Kategori</option>';
+            
+            // Ambil nama grup yang unik dan tidak kosong, lalu urutkan abjad
+            const uniqueGroups = [...new Set(allChannels.map(ch => ch.group))].filter(g => g !== 'Uncategorized' && g !== '').sort();
+            
+            uniqueGroups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group;
+                option.textContent = group;
+                categorySelect.appendChild(option);
+            });
+
+            // Tambahkan "Uncategorized" di bagian paling bawah jika ada
+            const hasUncategorized = allChannels.some(ch => ch.group === 'Uncategorized');
+            if(hasUncategorized) {
+                const option = document.createElement('option');
+                option.value = 'Uncategorized';
+                option.textContent = 'Lain-lain (Uncategorized)';
+                categorySelect.appendChild(option);
+            }
+        }
+
+        // Fungsi filter pencarian dan kategori
         function filterChannels() {
             const query = searchInput.value.toLowerCase();
-            if (!query) {
-                renderChannels(allChannels);
-                return;
-            }
+            const selectedCategory = categorySelect.value;
 
-            const filtered = allChannels.filter(ch => 
-                ch.name.toLowerCase().includes(query) || 
-                ch.group.toLowerCase().includes(query)
-            );
+            const filtered = allChannels.filter(ch => {
+                // Cek apakah cocok dengan pencarian nama
+                const matchQuery = ch.name.toLowerCase().includes(query) || ch.group.toLowerCase().includes(query);
+                // Cek apakah cocok dengan kategori yang dipilih dropdown
+                const matchCategory = selectedCategory === "" || ch.group === selectedCategory;
+                
+                return matchQuery && matchCategory;
+            });
             renderChannels(filtered);
         }
 
-        // Render daftar channel ke sidebar (Dibatasi 100 pertama agar tidak berat)
+        // Render daftar channel ke sidebar (Dibatasi 150 pertama agar tidak berat)
         function renderChannels(channelsToRender) {
             channelContainer.innerHTML = '';
             
@@ -234,7 +274,7 @@
                     ${iconHtml}
                     <div class="flex-grow font-medium truncate flex flex-col justify-center overflow-hidden">
                         <span class="truncate text-sm">${channel.name}</span>
-                        ${channel.group ? `<span class="text-[10px] text-slate-400 truncate">${channel.group}</span>` : ''}
+                        ${channel.group && channel.group !== 'Uncategorized' ? `<span class="text-[10px] text-slate-400 truncate">${channel.group}</span>` : ''}
                     </div>
                     ${activeChannelUrl === channel.url ? '<div class="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0"></div>' : ''}
                 `;
